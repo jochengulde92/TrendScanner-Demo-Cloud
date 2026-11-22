@@ -1,0 +1,4 @@
+# Isolated PT-28 Cloud pilot ONLY.
+# Streamlit Community Cloud detects this file next to app.py.
+# Do not import the repository root requirements.txt.
+streamlit==1.59.2
