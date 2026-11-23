@@ -78,7 +78,7 @@ def _clock(now: datetime | None) -> str:
 def _read_consistent_ledger(db_path: str | Path, account_id: str) -> tuple[dict, list, list]:
     """One SQLite read transaction: accounts, positions, and history aligned."""
     _account(account_id)
-    if type(db_path) not in (str, Path) or not str(db_path) or str(db_path) == ":memory:":
+    if not isinstance(db_path, (str, Path)) or not str(db_path) or str(db_path) == ":memory:":
         raise ValueError("PT31_LOCAL_FILE_REQUIRED")
     file = Path(db_path).expanduser().resolve()
     if not file.is_file():
