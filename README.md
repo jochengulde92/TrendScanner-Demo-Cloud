@@ -1,17 +1,34 @@
 # TrendScanner · künstliche Cloud-Demo
 
-Dies ist **ausschließlich eine isolierte öffentliche Quellcode-Vorschau** für Streamlit. Die enthaltenen Symbole `DEMO01` und `DEMO02`, Bewertungen und Depotwerte sind vollständig erfunden. Das Repository enthält **keine** echten Aktienkurse, Scannerberechnungen, privaten Depotdaten, Zugangsdaten, API-Schlüssel, Backend-Dienste oder Handelsaufträge.
+**PT-29 — Zwei getrennte Demo-Depots (nur Prototyp, nicht live auf der veröffentlichten App).**
+
+Dieses **öffentliche GitHub-Repository** enthält ausschließlich fiktive Anschauungsdaten. Die zugehörige Streamlit-App ist separat in den Streamlit-Cloud-Einstellungen auf **Only specific people can view this app** gestellt; die private Sichtbarkeit muss nach jeder Neuerstellung erneut kontrolliert werden. Der Quellcode hier bleibt öffentlich.
+
+## Zwei unabhängig betrachtete Depots
+
+- **Depot A – TrendScanner**: vorgesehene spätere Originalstrategie mit TrendScore, TQI und Confluence. Aktuell zwei vollständig erfundene Positionen und rein fiktive Bewertungen.
+- **Depot B – KI-Modell C3**: vorgesehene eigenständige C3-Strategie. Aktuell zwei andere vollständig erfundene Positionen und rein fiktive Bewertungen. **C3 läuft hier nicht.**
+
+Beide Konten starten separat mit **10.000 € Spielgeld**, enthalten unterschiedliche erfundene Symbole, führen eigene Cash-/Positions-/Gesamtwert- und rechnerische P&L-Summen und sind als getrennte Tabs dargestellt. Später kann ein weiteres Konto durch einen separaten `DemoAccount` erweitert werden, aber erst nach eigener Freigabe und eigenständigen Sicherheitsprüfungen.
 
 ## Dateien
 
-- `app.py` – eigenständige Streamlit-Oberfläche mit standardmäßig ausgeblendeten Beispieldaten
-- `requirements.txt` – einzige externe Python-Abhängigkeit: Streamlit
-- `README.md` – Sicherheitshinweise
+- `app.py` – responsive Streamlit-Darstellung, standardmäßig **ausgeschalteter** Demo-Schalter
+- `demo_model.py` – eingefrorene künstliche Datensätze, isolierte Portfolios und ganzzahlige Euro-Cent-Berechnung
+- `requirements.txt` – einzige Python-Paketabhängigkeit `streamlit==1.59.2`
+- `tests/test_demo_model.py` – lokale Standardbibliothek-Unittests für Trennung, Buchhaltung, Sicherheitsgrenzen und Datenformat
 
-## Wichtige Veröffentlichungshinweise
+Lokal ohne Streamlit zu installieren testen:
 
-**Ein öffentliches GitHub-Repository enthält öffentlich sichtbaren Quellcode.** Eine künftig von diesem Repository auf Streamlit Community Cloud veröffentlichte App ist **zunächst öffentlich**, bis in den Streamlit-App-Einstellungen unter **Sharing → Who can view this app → Only specific people can view this app** die Sichtbarkeit bewusst auf privat umgestellt und geprüft wurde. Vorher keine persönlichen Daten hinzufügen und den App-Link nicht als privaten Zugang behandeln.
+```bash
+python -m unittest discover -s tests -p 'test_*.py' -v
+python -m py_compile app.py demo_model.py
+```
 
-Diese Demo erfordert weder Login noch Streamlit-Secrets. Eine produktive Anwendung mit echten TrendScanner-Signalen, der Paper-Trading-Datenbank oder einem automatisch laufenden Agenten ist damit **nicht** implementiert. Ein solches System würde eine separate Freigabe, Authentifizierung und Backend-Infrastruktur benötigen.
+## Sicherheits- und Freigabegrenzen
 
-Das Repository soll **keine** Kopie oder einen Fork des vollständigen privaten TrendScanner-Repositories sein. Es dürfen hier ausschließlich die drei aufgeführten Demo-Dateien landen.
+**Keine** echten Aktien, Kurse, Scannerberechnungen, C3-Inferenz, Depoteinblicke, Zugangsdaten, API-Schlüssel, Brokerverbindung, Serverprozesse, automatischen Jobs, Dateipersistenz, Ordererstellung oder Käufe. Keine Datenverbindung zum privaten TrendScanner-Hauptprojekt, dessen Alpha-Gate oder echten Paper-Trading-Backend. Sämtliche Zahlen sind ausdrücklich erfunden.
+
+Das Haupt-Repository `jochengulde92/TrendScanner` bleibt **privat**. Dieser PT-29-Branch wird ausschließlich per **Draft-PR** geprüft. **Kein Merge auf `main` ohne gesonderte Zustimmung**, weil die laufende Streamlit-App durch Änderungen an `main` automatisch aktualisiert werden kann.
+
+Die echten Strategien, die Unterscheidung von Signalen und eine später sichere Paper-Order-Verwaltung müssen separat implementiert und freigegeben werden. `PT29_SOURCE_PREPARED` ist **nicht** `LIVE_PAPER_TRADING`.
