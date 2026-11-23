@@ -1,76 +1,85 @@
-"""PT-28: standalone, synthetic-only Streamlit Community Cloud preview.
+"""PT-29: isolated Streamlit preview with two *synthetic* virtual depots.
 
-A separate cloud pilot, NOT the live TrendScanner or private scanner.
-No backend, login, real account, provider, API, market data, broker,
-paper order, file I/O, external networking, or background worker.
-The UI is empty by default until the user explicitly opts in.
+No authentic TrendScanner signals, C3 inference, user accounts, APIs,
+prices, order routing, persistence, scheduled jobs or external networking.
+The only dependency is Streamlit; the sample data are static in memory.
 """
 from __future__ import annotations
 
 import streamlit as st
 
-SYNTHETIC = (
-    {
-        "ticker": "DEMO01",
-        "trend_score": 82,
-        "tqi": 76,
-        "confluence": 71,
-        "final_score": 79,
-        "status": "NUR DEMO – KEINE HANDELSFREIGABE",
-    },
-    {
-        "ticker": "DEMO02",
-        "trend_score": 64,
-        "tqi": 59,
-        "confluence": 43,
-        "final_score": 58,
-        "status": "NUR DEMO – KEINE HANDELSFREIGABE",
-    },
-)
+from demo_model import DEMO_ACCOUNTS, eur, position_rows
 
 st.set_page_config(
-    page_title="TrendScanner · Isolierte Cloud-Vorschau",
+    page_title="TrendScanner · Zwei Demo-Depots",
     page_icon="🔒",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-st.title("TrendScanner · Cloud-Vorschau")
+st.title("TrendScanner · Paper-Trading-Vorschau")
 st.warning(
-    "REINE TESTUMGEBUNG: Keine echten Aktien, Kurse, "
-    "TrendScanner-Signale, Depots oder Orders."
+    "ISOLIERTE TESTUMGEBUNG · Alle Symbole, Kurse, Depotwerte und Positionen "
+    "sind erfunden. Keine echten Scanner-Signale, KI-Entscheidungen oder Orders."
 )
 st.caption(
-    "PT-28: Isolierte iPad-/iPhone-Demo für ein künftiges "
-    "Hosting-Konzept. Keine Verbindung zum echten TrendScanner."
+    "PT-29 · Zwei getrennte, synthetische Beispieldepots auf iPad und iPhone. "
+    "Kein Backend, kein Broker, kein Datenabruf und keine Speicherung."
 )
-
-show = st.toggle("Künstliche Beispielwerte anzeigen", value=False, key="pt28_demo_enabled")
+show = st.toggle(
+    "Künstliche Demo-Depots anzeigen",
+    value=False,
+    key="pt29_demo_enabled",
+)
 
 if not show:
     st.info(
-        "Demodaten sind ausgeschaltet. Es werden weder Scanner-Daten "
-        "noch Depot- oder Marktdaten abgefragt."
+        "Die Beispieldaten sind ausgeschaltet. Zum Ansehen der vollständig "
+        "erfundenen Werte den Schalter aktivieren."
     )
 else:
+    st.subheader("Getrennte Strategie-Depots")
+    st.caption(
+        "Jedes Depot startet unabhängig mit 10.000 € Spielgeld. "
+        "Alle Bestände und Wertänderungen sind feste Beispielzahlen."
+    )
+    tabs = st.tabs([account.title for account in DEMO_ACCOUNTS])
+    for tab, account in zip(tabs, DEMO_ACCOUNTS):
+        with tab:
+            st.markdown(f"### {account.title}")
+            st.write(account.strategy)
+            st.info(account.limitation)
+            balance, depot_value, result = st.columns(3)
+            balance.metric("Spielgeld frei", eur(account.cash_cents))
+            depot_value.metric("Virtueller Gesamtwert", eur(account.equity_cents))
+            result.metric("Rechnerischer Demo-Effekt", eur(account.pnl_cents))
+            st.caption(f"Demo-Veränderung gegenüber Start: {account.pnl_pct:+.2f} %")
+            st.markdown("#### Künstliche Beispielpositionen")
+            st.dataframe(
+                position_rows(account),
+                hide_index=True,
+                use_container_width=True,
+            )
+            st.caption(
+                "Positionen sind vorgegebene Beispieldaten; es werden keine "
+                "Transaktionen angenommen, ausgelöst oder protokolliert."
+            )
+
+    st.divider()
+    st.subheader("Später erweiterbar")
+    st.write(
+        "Die Ansicht kann später Depot C, Depot D oder weitere Strategien "
+        "ergänzen. Dafür braucht jedes Setup eine getrennte Datenquelle, "
+        "unabhängige Bewertung und eigene Freigabe."
+    )
     st.warning(
-        "Nur künstlich erfundene Zahlen! Kein Kaufvorschlag, "
-        "kein Signal aus dem echten TrendScanner."
+        "Die echten TrendScore-/TQI-/Confluence-Signale und das C3-Modell "
+        "sind bewusst NICHT angebunden. Hier können keine Orders "
+        "ausgeführt oder gespeichert werden."
     )
-    st.subheader("Künstliche Scanner-Evidenz")
-    st.dataframe(
-        SYNTHETIC,
-        hide_index=True,
-        use_container_width=True,
-    )
-    st.subheader("Künstliches virtuelles Depot")
-    st.metric("Beispiel-Startwert", "10.000,00 €")
-    st.metric("Künstliche Orders", "0")
-    st.caption("Keine Anmeldung und keine Handelsfunktion vorhanden.")
 
 st.divider()
 st.caption(
-    "Private GitHub-Repositories, Cloud-Freigaben, Authentifizierung "
-    "und echtes Hosting sind nicht Bestandteil dieser Vorschau. "
-    "PT-28 ist kein produktiver Trading-Agent."
+    "Nur UI-Prototyp. Kein Live-Scan, keine KI-Agentenaktivität, "
+    "kein Paper-Order-System, keine Handelsfreigabe."
 )
