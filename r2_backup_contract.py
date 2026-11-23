@@ -8,6 +8,7 @@ replaying an old, internally valid backup.
 """
 from __future__ import annotations
 
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
@@ -83,7 +84,7 @@ def _read_consistent_ledger(db_path: str | Path, account_id: str) -> tuple[dict,
     if not file.is_file():
         raise ValueError("PT31_LEDGER_MISSING")
     try:
-        with sqlite3.connect(file.as_uri() + "?mode=ro", uri=True, timeout=5) as conn:
+        with closing(sqlite3.connect(file.as_uri() + "?mode=ro", uri=True, timeout=5)) as conn:
             conn.execute("PRAGMA query_only=ON")
             conn.execute("BEGIN")
             account = conn.execute(
@@ -151,6 +152,16 @@ def _reconcile(payload: object) -> tuple[str, int, int, int]:
         raise ValueError("PT31_POSITION_SIZE_BLOCKED")
     if type(snapshot["initial_cash_cents"]) is not int or snapshot["initial_cash_cents"] != INITIAL_CASH_CENTS:
         raise ValueError("PT31_START_CAPITAL_BLOCKED")
+    for position in snapshot["positions"]:
+        if (type(position) is not dict or set(position) != {
+            "symbol", "quantity", "cost_basis_cents",
+        } or type(position["symbol"]) is not str
+                or _SYMBOL.fullmatch(position["symbol"]) is None
+                or type(position["quantity"]) is not int
+                or not 1 <= position["quantity"] <= 1_000_000
+                or type(position["cost_basis_cents"]) is not int
+                or position["cost_basis_cents"] < 0):
+            raise ValueError("PT31_POSITION_SCHEMA_BLOCKED")
     cash = INITIAL_CASH_CENTS
     realized_total = 0
     held: dict[str, tuple[int, int]] = {}
